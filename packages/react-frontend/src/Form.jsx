@@ -1,4 +1,3 @@
-// src/Form.jsx
 import React, { useState } from "react";
 
 function Form(props) {
