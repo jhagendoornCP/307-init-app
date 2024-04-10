@@ -71,7 +71,7 @@ const addUser = (user) => {
   return user;
 };
 
-app.post("/users", (req, res) => {
+app.post("/users", (req, res) => { // If JSON format is incorrect, it doesn't post
   const userToAdd = req.body;
   addUser(userToAdd);
   res.send();
@@ -96,7 +96,7 @@ app.get("/users/:name/:job", (req, res) => {
   const name = req.params["name"]
   const job = req.params["job"]
   let result = findByNameAndJob(name, job);
-  if(result === undefined) {
+  if(result === undefined || result.length === 0) {
     res.status(404).send("Resource not found.");
   } else {
     res.status(200).send(result);
