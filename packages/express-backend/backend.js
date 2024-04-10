@@ -52,6 +52,7 @@ app.get("/users", (req, res) => {
     res.send(users);
   }
 });
+
 const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
@@ -64,6 +65,7 @@ app.get("/users/:id", (req, res) => {
     res.send(result);
   }
 });
+
 const addUser = (user) => {
   users["users_list"].push(user);
   return user;
@@ -75,6 +77,31 @@ app.post("/users", (req, res) => {
   res.send();
 });
 
+const removeUser = (id) => {
+  if(!findUserById(id)) {
+    return 404;
+  }
+  users["users_list"] = users["users_list"].filter((user) => user.id != id);
+  return 200;
+}
+
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"]; 
+  res.status(removeUser(id)).end()
+})
+
+const findByNameAndJob = (name, job) => users["users_list"].filter((user) => user.name === name && user.job === job)
+
+app.get("/users/:name/:job", (req, res) => {
+  const name = req.params["name"]
+  const job = req.params["job"]
+  let result = findByNameAndJob(name, job);
+  if(result === undefined) {
+    res.status(404).send("Resource not found.");
+  } else {
+    res.status(200).send(result);
+  }
+})
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
