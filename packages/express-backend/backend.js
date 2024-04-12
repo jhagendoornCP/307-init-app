@@ -108,7 +108,7 @@ const removeUser = (id) => {
     return 404;
   }
   users["users_list"] = users["users_list"].filter((user) => user.id != id);
-  return 200;
+  return 204;
 }
 
 app.delete("/users/:id", (req, res) => {

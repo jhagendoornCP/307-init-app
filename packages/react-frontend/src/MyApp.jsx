@@ -6,18 +6,21 @@ import Form from "./Form.jsx";
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((c, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
+  function removeOneCharacter(id) {
+    deleteUser(id)
+      .then((res) => {
+        if(res.status === 204) {
+          setCharacters([...characters.filter((user) => user.id != id)])
+        } else console.log(res.status);
+      })
+      .catch((error) => console.log(error));
   }
   function updateList(person) {
     postUser(person)
       .then((res) => {
         if(res.status === 201){
           setCharacters([...characters, res.json()])
-        } else console.log(res.status);
+        } else console.log(res.status)
       })
       .catch((error) => {
         console.log(error)
@@ -34,6 +37,17 @@ function MyApp() {
         "Content-Type": "application/json", 
       },
       body: JSON.stringify(person),
+    });
+
+    return promise;
+  }
+  function deleteUser(id) {
+    const promise = fetch(`http://localhost:8000/users/${id}`, {
+      method: "DELETE", 
+      headers: {
+        "Content-Type": "application/json",
+      }, 
+      body: "",
     });
 
     return promise;
