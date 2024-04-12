@@ -32,7 +32,7 @@ const users = {
     },
   ],
 };
-const maxUserCapacity = 10; // Limit max number of users to 10
+const MAX_USERS = 10; // Limit max number of users to 10
 
 app.use(cors())
 app.use(express.json());
@@ -70,13 +70,6 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
-  const exists = findByNameAndJob(user.name, user.job); // ID not assigned to new users yet, will change later
-  if(exists != []) { 
-    return 400; // Bad request; user already exists
-  } else if(users["users_list"].length === maxUserCapacity) {
-    return 507; // Insufficient storage, probably could also do 504
-  }
-
   try {
     users["users_list"].push(user);
     return 201;
@@ -92,8 +85,20 @@ const generateID = () => {
 
 app.post("/users", (req, res) => { // If JSON format is incorrect, it doesn't post
   const userToAdd = req.body;
-  userToAdd.id = generateID();
+  if(findByNameAndJob(userToAdd) !== undefined) {
+    res.status(400).end(); // User already exists. Technically, it might be a different user 
+    // and so we could give them a new ID, which would make them unique, but I felt that in such 
+    // a small scale application as this if the name & job are the same it's okay to just assume
+    // that the people are the same, so don't add them again.
+  }
+  if(users["users_list"].length === MAX_USERS) {
+    return 507; // Insufficient storage, probably could also do 504
+    // Storage is a soft limit set by MAX_USERS, which is declared under users[]
+  }
+
+  userToAdd.id = generateID(); // Generate a random ID.
   const code = addUser(userToAdd);
+
   if(code === 201) res.status(201).send(userToAdd); // Return user
   else res.status(code).end(); // Do not return user
 });
@@ -111,13 +116,13 @@ app.delete("/users/:id", (req, res) => {
   res.status(removeUser(id)).end()
 })
 
-const findByNameAndJob = (name, job) => users["users_list"].filter((user) => user.name === name && user.job === job)
+const findByNameAndJob = (name, job) => users["users_list"].find((user) => user.name === name && user.job === job)
 
 app.get("/users/:name/:job", (req, res) => {
   const name = req.params["name"]
   const job = req.params["job"]
   let result = findByNameAndJob(name, job);
-  if(result === undefined || result.length === 0) {
+  if(result === undefined) {
     res.status(404).send("Resource not found.");
   } else {
     res.status(200).send(result);
