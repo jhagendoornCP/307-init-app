@@ -3,8 +3,6 @@ import Table from "./Table.jsx";
 import Form from "./Form.jsx";
 
 
-
-
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
@@ -16,7 +14,11 @@ function MyApp() {
   }
   function updateList(person) {
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then((res) => {
+        if(res.status === 201){
+          setCharacters([...characters, person])
+        } else console.log(res.status);
+      })
       .catch((error) => {
         console.log(error)
       })

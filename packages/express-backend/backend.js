@@ -32,6 +32,7 @@ const users = {
     },
   ],
 };
+const maxUserCapacity = 10; // Limit max number of users to 10
 
 app.use(cors())
 app.use(express.json());
@@ -69,14 +70,32 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
-  users["users_list"].push(user);
-  return user;
+  const exists = findByNameAndJob(user.name, user.job); // ID not assigned to new users yet, will change later
+  if(exists != []) { 
+    return 400; // Bad request; user already exists
+  } else if(users["users_list"].length === maxUserCapacity) {
+    return 507; // Insufficient storage, probably could also do 504
+  }
+
+  try {
+    users["users_list"].push(user);
+    return 201;
+  } catch(error) {
+    console.log(`Error when adding user; ${error}`)
+    return 500;
+  }
 };
+
+const generateID = () => {
+  return Math.random(); // just returns random ID atm
+}
 
 app.post("/users", (req, res) => { // If JSON format is incorrect, it doesn't post
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
+  userToAdd.id = generateID();
+  const code = addUser(userToAdd);
+  if(code === 201) res.status(201).send(userToAdd); // Return user
+  else res.status(code).end(); // Do not return user
 });
 
 const removeUser = (id) => {
