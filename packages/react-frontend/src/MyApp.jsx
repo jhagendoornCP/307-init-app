@@ -19,8 +19,13 @@ function MyApp() {
     postUser(person)
       .then((res) => {
         if(res.status === 201){
-          setCharacters([...characters, res.json()])
-        } else console.log(res.status)
+          return res.json()
+        } else {
+          return Promise.reject(`Request failed with ${res.status}`);
+        }
+      })
+      .then((data) => {
+          setCharacters([...characters, data])
       })
       .catch((error) => {
         console.log(error)
