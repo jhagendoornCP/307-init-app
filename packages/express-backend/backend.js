@@ -5,31 +5,7 @@ const app = express();
 const port = 8000;
 const users = {
   users_list: [
-    {
-      id: "xyz789",
-      name: "Charlie",
-      job: "Janitor",
-    },
-    {
-      id: "abc123",
-      name: "Mac",
-      job: "Bouncer",
-    },
-    {
-      id: "ppp222",
-      name: "Mac",
-      job: "Professor",
-    },
-    {
-      id: "yat999",
-      name: "Dee",
-      job: "Aspring actress",
-    },
-    {
-      id: "zap555",
-      name: "Dennis",
-      job: "Bartender",
-    },
+    
   ],
 };
 const MAX_USERS = 10; // Limit max number of users to 10
@@ -80,7 +56,9 @@ const addUser = (user) => {
 };
 
 const generateID = () => {
-  return Math.random(); // just returns random ID atm
+  //Note: The "toFixed" rounds the generated number to 8 decimals, 
+  // since the id was too many decimals originally to transfer across api
+  return Math.random().toFixed(8); 
 }
 
 app.post("/users", (req, res) => { // If JSON format is incorrect, it doesn't post
@@ -104,7 +82,7 @@ app.post("/users", (req, res) => { // If JSON format is incorrect, it doesn't po
 });
 
 const removeUser = (id) => {
-  if(!findUserById(id)) {
+  if(findUserById(id) === undefined) {
     return 404;
   }
   users["users_list"] = users["users_list"].filter((user) => user.id != id);
