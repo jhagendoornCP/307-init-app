@@ -63,15 +63,17 @@ const generateID = () => {
 
 app.post("/users", (req, res) => { // If JSON format is incorrect, it doesn't post
   const userToAdd = req.body;
-  if(findByNameAndJob(userToAdd) !== undefined) {
+  if(findByNameAndJob(userToAdd.name, userToAdd.job) !== undefined) {
     res.status(400).end(); // User already exists. Technically, it might be a different user 
     // and so we could give them a new ID, which would make them unique, but I felt that in such 
     // a small scale application as this if the name & job are the same it's okay to just assume
     // that the people are the same, so don't add them again.
+    return;
   }
   if(users["users_list"].length === MAX_USERS) {
-    return 507; // Insufficient storage, probably could also do 504
+    res.status(507).end() // Insufficient storage, probably could also do 504
     // Storage is a soft limit set by MAX_USERS, which is declared under users[]
+    return;
   }
 
   userToAdd.id = generateID(); // Generate a random ID.
