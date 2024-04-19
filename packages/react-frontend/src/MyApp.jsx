@@ -10,7 +10,7 @@ function MyApp() {
     deleteUser(id)
       .then((res) => {
         if(res.status === 204) {
-          setCharacters([...characters.filter((user) => user.id != id)])
+          setCharacters([...characters.filter((user) => user._id != id)])
         } else console.log(res.status);
       })
       .catch((error) => console.log(error));
@@ -18,14 +18,10 @@ function MyApp() {
   function updateList(person) {
     postUser(person)
       .then((res) => {
-        if(res.status === 201){
-          return res.json()
-        } else {
-          return Promise.reject(`Request failed with ${res.status}`);
-        }
+        return res.status === 201 ? res.json() : Promise.reject(`Request failed with ${res.status}`);
       })
       .then((data) => {
-          setCharacters([...characters, data])
+        setCharacters([...characters, data])
       })
       .catch((error) => {
         console.log(error)
