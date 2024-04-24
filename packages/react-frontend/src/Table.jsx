@@ -14,6 +14,7 @@ function TableHeader() {
 }
 
 function TableBody(props) {
+  if(!props.characterData) return <tbody></tbody>;
   const rows = props.characterData.map((row, index) => {
     return (
       <tr key={index}>
